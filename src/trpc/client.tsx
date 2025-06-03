@@ -9,6 +9,13 @@ import { makeQueryClient } from './query-client';
 import type { AppRouter } from './routers/_app';
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
 let browserQueryClient: QueryClient;
+/**
+ * Returns a React Query client instance, creating a new one per request on the server and reusing a singleton on the client.
+ *
+ * @returns The React Query client instance appropriate for the current environment.
+ *
+ * @remark On the server, a new client is created for each call to avoid cross-request state sharing. On the client, a singleton is reused to prevent unnecessary re-creation during React suspense or re-renders.
+ */
 function getQueryClient() {
   if (typeof window === 'undefined') {
     // Server: always make a new query client
@@ -21,6 +28,11 @@ function getQueryClient() {
   if (!browserQueryClient) browserQueryClient = makeQueryClient();
   return browserQueryClient;
 }
+/**
+ * Returns the tRPC API endpoint URL, using a relative path on the client and an absolute URL with the app's base address on the server.
+ *
+ * @returns The URL string for the tRPC API endpoint.
+ */
 function getUrl() {
   const base = (() => {
     if (typeof window !== 'undefined') return '';
@@ -28,6 +40,13 @@ function getUrl() {
   })();
   return `${base}/api/trpc`;
 }
+/**
+ * Provides tRPC and React Query context to its child components in a Next.js client environment.
+ *
+ * Wraps children with both the React Query `QueryClientProvider` and the tRPC `TRPCProvider`, ensuring a properly configured client instance for each.
+ *
+ * @param children - The React elements to render within the provider context.
+ */
 export function TRPCReactProvider(
   props: Readonly<{
     children: React.ReactNode;
