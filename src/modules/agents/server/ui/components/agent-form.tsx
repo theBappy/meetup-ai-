@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { GeneratedAvatar } from "@/components/ui/generated-avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from 'sonner'
+import { toast } from "sonner";
 
 interface AgentFormProps {
   onSuccess?: () => void;
@@ -38,20 +38,38 @@ export const AgentForm = ({
     trpc.agents.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries(
-            trpc.agents.getMany.queryOptions({}),
+          trpc.agents.getMany.queryOptions({})
         );
 
-        if(initialValues?.id){
-            await queryClient.invalidateQueries(
-                trpc.agents.getOne.queryOptions({id: initialValues.id}),
-            )
+        // TODO: invalidate free tier usage
+
+        onSuccess?.();
+      },
+      onError: (error) => {
+        toast.error(error.message);
+
+        // TODO: check if error code is "FORBIDDEN" redirect to "/upgrade"
+      },
+    })
+  );
+  const updateAgent = useMutation(
+    trpc.agents.update.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.agents.getMany.queryOptions({})
+        );
+
+        if (initialValues?.id) {
+          await queryClient.invalidateQueries(
+            trpc.agents.getOne.queryOptions({ id: initialValues.id })
+          );
         }
         onSuccess?.();
       },
       onError: (error) => {
-        toast.error(error.message)
+        toast.error(error.message);
 
-        // TODO: check if error code is "FORBIDDEN" redirect to "/upgrade" 
+        // TODO: check if error code is "FORBIDDEN" redirect to "/upgrade"
       },
     })
   );
@@ -65,11 +83,11 @@ export const AgentForm = ({
   });
 
   const isEdit = !!initialValues?.id;
-  const isPending = createAgent.isPending;
+  const isPending = createAgent.isPending || updateAgent.isPending;
 
   const onSubmit = (values: z.infer<typeof agentsInsertSchema>) => {
     if (isEdit) {
-      console.log("TODO: updateAgent");
+      updateAgent.mutate({ ...values, id: initialValues.id });
     } else {
       createAgent.mutate(values);
     }
@@ -79,53 +97,53 @@ export const AgentForm = ({
     <Form {...form}>
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <GeneratedAvatar
-        seed={form.watch("name")}
-        variant="botttsNeutral"
-        className="border size-16"
+          seed={form.watch("name")}
+          variant="botttsNeutral"
+          className="border size-16"
         />
-        <FormField 
-        name="name"
-        control={form.control}
-        render={({field}) => (
+        <FormField
+          name="name"
+          control={form.control}
+          render={({ field }) => (
             <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                    <Input placeholder="e.g. Math Tutor" {...field} />
-                </FormControl>
-                <FormMessage />
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. Math Tutor" {...field} />
+              </FormControl>
+              <FormMessage />
             </FormItem>
-        )}
+          )}
         />
-        <FormField 
-        name="instructions"
-        control={form.control}
-        render={({field}) => (
+        <FormField
+          name="instructions"
+          control={form.control}
+          render={({ field }) => (
             <FormItem>
-                <FormLabel>Instructions</FormLabel>
-                <FormControl>
-                    <Textarea 
-                    placeholder="You are a helpful math assistant that can answer questions and help with assignment." 
-                    {...field} />
-                </FormControl>
-                <FormMessage />
+              <FormLabel>Instructions</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="You are a helpful math assistant that can answer questions and help with assignment."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
             </FormItem>
-        )}
+          )}
         />
         <div className="flex justify-between gap-x-2">
-            {onCancel && (
-                <Button
-                variant="ghost"
-                disabled={isPending}
-                type="button"
-                onClick={()=>onCancel()}
-                >Cancel</Button>
-            )}
+          {onCancel && (
             <Button
-            disabled={isPending}
-            type="submit"   
+              variant="ghost"
+              disabled={isPending}
+              type="button"
+              onClick={() => onCancel()}
             >
-                {isEdit ? 'Update' : 'Create'}
+              Cancel
             </Button>
+          )}
+          <Button disabled={isPending} type="submit">
+            {isEdit ? "Update" : "Create"}
+          </Button>
         </div>
       </form>
     </Form>
