@@ -18,6 +18,14 @@ function verifySignatureWithSDK(body: string, signature: string): boolean {
   return streamVideo.verifyWebhook(body, signature);
 }
 
+/**
+ * Handles POST webhook events from the video call service, verifying signatures and processing call-related events.
+ *
+ * Validates the request signature and processes supported event types, including session start, participant left, session ended, transcription ready, and recording ready. Updates meeting and agent records in the database, manages call state, and triggers downstream processing as needed.
+ *
+ * @param req - The incoming Next.js request containing the webhook event.
+ * @returns A JSON response indicating success or an error with the appropriate HTTP status code.
+ */
 export async function POST(req: NextRequest) {
   const signature = req.headers.get("x-signature");
   const apiKey = req.headers.get("x-api-key");
