@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meetup-AI
 
-## Getting Started
+Meetup-AI is a modern SaaS platform where users can create their own AI agents, set up meetings with them, and conduct video calls that automatically generate transcripts and intelligent summaries.
 
-First, run the development server:
+Built using the latest Next.js stack, Radix UI components, Stream SDK for video, and Inngest for background jobs — Meetup-AI is designed to offer seamless real-time interaction and AI-powered productivity.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Create an account through google, github, face and then log in**: Users can create an account then log in.
+- **Create AI Agents**: Users can customize and spin up their own agents in seconds.
+- **Schedule Meetings**: Book and host meetings with AI agents or other users.
+- **Video Calls**: Real-time, high-quality video calls powered by [Stream Video SDK](https://getstream.io/video/).
+- **Recordings of the video call**: Real-time high-quality call recording & can view the recording later
+- **Transcripts + Summaries**: Get post-call transcripts and AI-generated summaries.
+- **Free & Paid Plans**: Tiered pricing for casual users and power users alike.
+- **Modern UI**: Beautiful, responsive interface built with TailwindCSS and Radix UI.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Core
+- **Next.js 15** – App Router, Server Actions, and Edge support
+- **React 19** – Latest features for a modern reactive experience
+- **TailwindCSS v4** – Utility-first styling
+- **Radix UI** – Accessible, composable UI primitives
+- **Drizzle ORM + NeonDB** – Type-safe SQL and serverless PostgreSQL
+- **tRPC** – End-to-end typesafe API layer
+- **Inngest** – Background jobs (e.g. transcription, summarization)
+- **Stream SDK** – Video calls and real-time AI events
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Auth & State
+- **better-auth** – Lightweight authentication system
+- **react-hook-form + zod** – Forms with validation
+- **@tanstack/react-query** – Data fetching and cache
 
-## Deploy on Vercel
+### Developer Experience
+- **TypeScript** – End-to-end static typing
+- **ESLint + Prettier** – Code consistency
+- **drizzle-kit** – ORM toolkit for schema and migration
+- **ngrok** – Tunneling for webhook development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Getting Started
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/your-username/meetup-ai.git
+   cd meetup-ai
