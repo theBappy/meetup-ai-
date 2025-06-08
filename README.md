@@ -9,7 +9,7 @@ Built using the latest Next.js stack, Radix UI components, Stream SDK for video,
 ## ✨ Features
 
 
-- **Create an account through google, github, face and then log in**: Users can create an account then log in.
+- **Create an account through google, github, facebook and then log in**: Users can create an account then log in.
 - **Create AI Agents**: Users can customize and spin up their own agents in seconds.
 - **Schedule Meetings**: Book and host meetings with AI agents or other users.
 - **Video Calls**: Real-time, high-quality video calls powered by [Stream Video SDK](https://getstream.io/video/).
@@ -44,6 +44,9 @@ Built using the latest Next.js stack, Radix UI components, Stream SDK for video,
 - **ngrok** – Tunneling for webhook development
 
 ---
+
+---
+** Still some feature developments on-going **
 
 ## 🚀 Getting Started
 
