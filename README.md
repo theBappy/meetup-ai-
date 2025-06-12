@@ -5,10 +5,12 @@ Meetup-AI is a modern SaaS platform where users can create their own AI agents, 
 Built using the latest Next.js stack, Radix UI components, Stream SDK for video, and Inngest for background jobs — Meetup-AI is designed to offer seamless real-time interaction and AI-powered productivity.
 
 ---
+📦 Tech Stack
+<p align="center"> <img src="https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white" /> <img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB" /> <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white" /> <img src="https://img.shields.io/badge/Radix_UI-8B5CF6?logoColor=white" /> <img src="https://img.shields.io/badge/Drizzle_ORM-0A0A0A?logoColor=white" /> <img src="https://img.shields.io/badge/NeonDB-00E599?logo=neon&logoColor=white" /> <img src="https://img.shields.io/badge/tRPC-2596be?logoColor=white" /> <img src="https://img.shields.io/badge/Inngest-FF6B6B?logoColor=white" /> <img src="https://img.shields.io/badge/Stream_Video-006CFF?logo=stream&logoColor=white" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Zod-EF4444?logoColor=white" /> <img src="https://img.shields.io/badge/react--hook--form-EC5990?logoColor=white" /> <img src="https://img.shields.io/badge/TanStack_Query-FF4154?logoColor=white" /> <img src="https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white" /> <img src="https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=black" /> <img src="https://img.shields.io/badge/ngrok-1F1F1F?logoColor=white" /> </p>
+
+
 
 ## ✨ Features
-
-
 - **Create an account through google, github, facebook and then log in**: Users can create an account then log in.
 - **Create AI Agents**: Users can customize and spin up their own agents in seconds.
 - **Schedule Meetings**: Book and host meetings with AI agents or other users.
@@ -20,7 +22,6 @@ Built using the latest Next.js stack, Radix UI components, Stream SDK for video,
 
 ---
 
-## 📦 Tech Stack
 
 ### Core
 - **Next.js 15** – App Router, Server Actions, and Edge support
