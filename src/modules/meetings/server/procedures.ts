@@ -1,8 +1,17 @@
 import { db } from "@/db";
 import { z } from "zod";
-import { agents, meetings } from "@/db/schema";
+import { agents, meetings, user } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+  sql,
+} from "drizzle-orm";
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
@@ -11,11 +20,110 @@ import {
 } from "@/constants";
 import { TRPCError } from "@trpc/server";
 import { meetingsInsertSchema, meetingsUpdateSchema } from "../schema";
-import { MeetingStatus } from "../types";
+import { MeetingStatus, StreamTranscriptItem } from "../types";
 import { streamVideo } from "@/lib/stream-video";
 import { generateAvatarUri } from "@/lib/avatar";
+import JSONL from "jsonl-parse-stringify";
+import { streamChat } from "@/lib/stream-chat";
 
 export const meetingsRouter = createTRPCRouter({
+  generateChatToken: protectedProcedure.mutation(async({ctx}) =>{
+    const token = streamChat.createToken(ctx.auth.user.id);
+    await streamChat.upsertUser({
+      id: ctx.auth.user.id,
+      role: 'admin'
+    });
+    return token;
+  }),
+  getTranscript: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      // 1. Validate meeting exists and belongs to user
+      const [existingMeeting] = await db
+        .select()
+        .from(meetings)
+        .where(
+          and(eq(meetings.id, input.id), eq(meetings.userId, ctx.auth.user.id))
+        );
+
+      if (!existingMeeting) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Meeting not found",
+        });
+      }
+
+      // 2. Return empty array if no transcript URL
+      if (!existingMeeting.transcriptUrl) {
+        return [];
+      }
+
+      // 3. Fetch transcript from the URL
+      const transcript = await fetch(existingMeeting.transcriptUrl)
+        .then((res) => res.text())
+        .then((text) =>
+          text
+            .split("\n")
+            .filter(Boolean)
+            .map((line) => JSON.parse(line) as StreamTranscriptItem)
+        )
+        .catch(() => {
+          return [];
+        });
+
+      // 4. Extract speaker IDs
+      const speakerIds = [
+        ...new Set(transcript.map((item) => item.speaker_id)),
+      ];
+
+      // 5. Get user speakers
+      const userSpeakers = await db
+        .select()
+        .from(user)
+        .where(inArray(user.id, speakerIds))
+        .then((users) =>
+          users.map((user) => ({
+            ...user,
+            image:
+              user.image ??
+              generateAvatarUri({ seed: user.name, variant: "initials" }),
+          }))
+        );
+
+      // 6. Get agent speakers
+      const agentSpeakers = await db
+        .select()
+        .from(agents)
+        .where(inArray(agents.id, speakerIds))
+        .then((agents) =>
+          agents.map((agent) => ({
+            ...agent,
+            image: generateAvatarUri({
+              seed: agent.name,
+              variant: "botttsNeutral",
+            }),
+          }))
+        );
+
+      // 7. Combine all speakers
+      const speakers = [...userSpeakers, ...agentSpeakers];
+
+      // 8. Attach speaker info to transcript items
+      const transcriptWithSpeakers = transcript.map((item) => {
+        const speaker = speakers.find((s) => s.id === item.speaker_id);
+        return {
+          ...item,
+          user: {
+            name: speaker?.name ?? "Unknown",
+            image:
+              speaker?.image ??
+              generateAvatarUri({ seed: "Unknown", variant: "initials" }),
+          },
+        };
+      });
+
+      return transcriptWithSpeakers;
+    }),
   generateToken: protectedProcedure.mutation(async ({ ctx }) => {
     await streamVideo.upsertUsers([
       {
@@ -84,7 +192,6 @@ export const meetingsRouter = createTRPCRouter({
         })
         .returning();
 
-      
       const call = streamVideo.video.call("default", createdMeeting.id);
       await call.create({
         data: {
@@ -106,23 +213,26 @@ export const meetingsRouter = createTRPCRouter({
           },
         },
       });
-      const [existingAgent] = await db.select().from(agents).where(eq(agents.id, createdMeeting.agentId))
+      const [existingAgent] = await db
+        .select()
+        .from(agents)
+        .where(eq(agents.id, createdMeeting.agentId));
 
-      if(!existingAgent){
-        throw new TRPCError({code: 'NOT_FOUND', message: 'Agent not found'})
+      if (!existingAgent) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
       }
 
       await streamVideo.upsertUsers([
         {
           id: existingAgent.id,
           name: existingAgent.name,
-          role: 'user',
+          role: "user",
           image: generateAvatarUri({
             seed: existingAgent.name,
-            variant: 'botttsNeutral'
-          })
-        }
-      ])
+            variant: "botttsNeutral",
+          }),
+        },
+      ]);
 
       return createdMeeting;
     }),
